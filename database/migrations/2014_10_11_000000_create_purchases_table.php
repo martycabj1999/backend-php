@@ -18,7 +18,7 @@ class CreatePurchasesTable extends Migration
             $table->string('title');
             $table->float('mount');
             $table->string('code');
-            $table->boolean('verified');
+            $table->boolean('verified')->default(false);
             $table->unsignedBigInteger('user_id')->nullable();
             $table->foreign('user_id')
                 ->references('id')->on('users')

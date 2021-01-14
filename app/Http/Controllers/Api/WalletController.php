@@ -27,12 +27,12 @@ class WalletController extends Controller
         $this->middleware('auth');
     }
 
-    public function findWallet()
+    public function findWallet(Request $request)
     {
-        dd('asdas');
         try {
 
-            $response['data'] = Wallet::findWalletService(
+            $wallet = new Wallet();
+            $response['data'] = $wallet->findWalletService(
                 $request['identification_number'],
                 $request['phone']
             );
@@ -49,10 +49,12 @@ class WalletController extends Controller
     {
         try {
 
-            $response['data'] = Wallet::updateWalletService(
+            $wallet = new Wallet();
+
+            $response['data'] = $wallet->updateWalletService(
                 $request['identification_number'],
                 $request['phone'],
-                $request['amount']
+                $request['mount']
             );
             
             return \Response::json($response, 200);
@@ -66,11 +68,11 @@ class WalletController extends Controller
     public function purchase(Request $request)
     {
         try {
+            $wallet = new Wallet();
 
-            $response['data'] = Wallet::purchaseService(
-                Auth::user()->id,
+            $response['data'] = $wallet->purchaseService(
                 $request['title'],
-                $request['amount']
+                $request['mount']
             );
             
             return \Response::json($response, 200);
@@ -84,9 +86,9 @@ class WalletController extends Controller
     public function purchaseVerified(Request $request)
     {
         try {
+            $wallet = new Wallet();
 
-            $response['data'] = Wallet::purchaseVerifiedService(
-                Auth::user()->id,
+            $response['data'] = $wallet->purchaseVerifiedService(
                 $request['code']
             );
 
