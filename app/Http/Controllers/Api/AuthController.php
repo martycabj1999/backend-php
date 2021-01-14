@@ -86,6 +86,8 @@ class AuthController extends Controller {
         }
 
         $user = $request->user();
+        $role['name'] = 'admin';
+        $user['role'] = $role;
 
         $tokenResult = $user->createToken('Personal Access Token');
         $token = $tokenResult->token;
