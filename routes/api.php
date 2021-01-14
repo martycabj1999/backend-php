@@ -30,6 +30,8 @@ Route::group(['prefix' => 'auth'], function () {
 });
 
 Route::group(['prefix' => 'wallets'], function () {
+    
+    Route::post('find', 'Api\WalletController@findWallet');
 
     Route::group(['middleware' => 'auth:api'], function() {
         Route::get('purchase', 'Api\WalletController@purchase');

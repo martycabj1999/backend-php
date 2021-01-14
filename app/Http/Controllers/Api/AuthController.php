@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 //Models
 use App\User;
-
+use App\Wallet;
 
 //Dependencias
 use Mail;
@@ -20,17 +20,21 @@ class AuthController extends Controller {
     {
         $request->validate([
             'name'     => 'required|string',
+            'identification_number'     => 'required',
+            'phone'     => 'required',
             'email'    => 'required|string|email|unique:users',
             'password' => 'required|string',
         ]);
 
         $user = new User([
-            'name'     => $name,
+            'name'     => $request->name,
+            'identification_number'    => intval($request->identification_number),
+            'phone'    => intval($request->phone),
             'email'    => $request->email,
             'password' => bcrypt($request->password)
         ]);
         $user->save();
-
+        
         $credentials = request(['email', 'password']);
         if (!Auth::attempt($credentials)) {
             return response()->json([
@@ -38,6 +42,11 @@ class AuthController extends Controller {
         }
 
         $user = $request->user();
+        
+        $wallet = new Wallet([
+            'user_id'     => $user->id,
+        ]);
+        $wallet->save();
 
         $tokenResult = $user->createToken('Personal Access Token');
         $token = $tokenResult->token;

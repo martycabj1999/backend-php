@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -18,7 +19,7 @@ use App\Wallet;
 use Response;
 use Carbon\Carbon;
 
-class WalletsController extends Controller
+class WalletController extends Controller
 {
 
     public function __construct()
@@ -26,10 +27,15 @@ class WalletsController extends Controller
         $this->middleware('auth');
     }
 
-    public function index()
+    public function findWallet()
     {
+        dd('asdas');
         try {
-            $response['data'] = Wallet::all();
+
+            $response['data'] = Wallet::findWalletService(
+                $request['identification_number'],
+                $request['phone']
+            );
 
             return \Response::json($response, 200);
         } catch (\Exception $e) {
@@ -39,13 +45,14 @@ class WalletsController extends Controller
         }
     }
 
-    public function purchase(Request $request)
+    public function updateWallet(Request $request)
     {
         try {
 
-            $response['data'] = $this->updateWallet(
-                Auth::user()->id,
-                $request['name']
+            $response['data'] = Wallet::updateWalletService(
+                $request['identification_number'],
+                $request['phone'],
+                $request['amount']
             );
             
             return \Response::json($response, 200);
@@ -55,20 +62,42 @@ class WalletsController extends Controller
             return \Response::json($response, 500);
         }
     }
-    
-    public function purchaseVerified(Request $request)
+
+    public function purchase(Request $request)
     {
         try {
 
-            $response['data'] = $this->updateWallet(
+            $response['data'] = Wallet::purchaseService(
                 Auth::user()->id,
-                $request['name']
+                $request['title'],
+                $request['amount']
             );
             
             return \Response::json($response, 200);
         } catch (\Exception $e) {
-            \Log::error("Error updateWallet " . $e->getMessage() . " in file " . $e->getFile() . "@" . $e->getLine());
-            $response['error'] = "Error updateWallet " . $e->getMessage() . " in file " . $e->getFile() . "@" . $e->getLine();
+            \Log::error("Error purchase " . $e->getMessage() . " in file " . $e->getFile() . "@" . $e->getLine());
+            $response['error'] = "Error purchase " . $e->getMessage() . " in file " . $e->getFile() . "@" . $e->getLine();
+            return \Response::json($response, 500);
+        }
+    }
+
+    public function purchaseVerified(Request $request)
+    {
+        try {
+
+            $response['data'] = Wallet::purchaseVerifiedService(
+                Auth::user()->id,
+                $request['code']
+            );
+
+            if($response['data']){
+                return \Response::json($response, 200);
+            }
+            
+            return \Response::json($response, 422);
+        } catch (\Exception $e) {
+            \Log::error("Error purchaseVerified " . $e->getMessage() . " in file " . $e->getFile() . "@" . $e->getLine());
+            $response['error'] = "Error purchaseVerified " . $e->getMessage() . " in file " . $e->getFile() . "@" . $e->getLine();
             return \Response::json($response, 500);
         }
     }

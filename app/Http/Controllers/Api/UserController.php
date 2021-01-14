@@ -17,7 +17,7 @@ use App\User;
 use Response;
 use Carbon\Carbon;
 
-class UsersController extends Controller
+class UserController extends Controller
 {
 
     public function __construct()
