@@ -16,3 +16,24 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::group(['prefix' => 'auth'], function () {
+
+    Route::post('login', 'Api\AuthController@login');
+    Route::post('signup', 'Api\AuthController@signup');
+
+    Route::group(['middleware' => 'auth:api'], function() {
+        Route::get('logout', 'Api\AuthController@logout');
+        Route::get('user', 'Api\AuthController@user');
+    });
+    
+});
+
+Route::group(['prefix' => 'wallets'], function () {
+
+    Route::group(['middleware' => 'auth:api'], function() {
+        Route::get('purchase', 'Api\WalletController@purchase');
+        Route::get('purchase/verified', 'Api\WalletController@purchaseVerified');
+    });
+
+});

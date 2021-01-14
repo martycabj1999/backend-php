@@ -37,4 +37,14 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function wallet()
+    {
+        return $this->belongsTo('App\Wallet', 'user_id');
+    }
+
+    public function purchase()
+    {
+        return $this->belongsTo('App\Purchase', 'user_id');
+    }
 }
