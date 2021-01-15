@@ -123,6 +123,12 @@ class WalletController extends Controller
                     "msg" => "invalid code",
                 );
                 return \Response::json($response, 422);
+            } else if ($response['data'] == 'Insufficient balance'){
+                $response['errors'] = array(
+                    "params" => "amount",
+                    "msg" => "Insufficient balance",
+                );
+                return \Response::json($response, 422);
             }
             
             return \Response::json($response, 200);

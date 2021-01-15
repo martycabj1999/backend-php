@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use App\User;
 use App\Purchase;
+use Mail;
 
 class Wallet extends Model
 {
@@ -102,7 +103,12 @@ class Wallet extends Model
         }
                         
         $wallet = Wallet::find($purchase->user_id);
+        $user = User::find($purchase->user_id);
         
+        if(!$user){
+            return false;
+        }
+
         if(!$wallet){
             return false;
         }
@@ -113,7 +119,14 @@ class Wallet extends Model
 
             $wallet->amount = $wallet->amount - $purchase->amount;
             $wallet->save();
+        } else {
+            return 'Insufficient balance';
         }
+
+        Mail::send('email.verified', ['user' => $user, 'code' => $code, 'purchase' => $purchase], function ($m) use ($user) {
+            $m->from('backend@php.com', 'Purchase code');
+            $m->to($user->email)->subject('Purchase code!');
+        });
 
         return $wallet;
     }
