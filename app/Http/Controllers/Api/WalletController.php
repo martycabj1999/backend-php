@@ -71,6 +71,7 @@ class WalletController extends Controller
             $wallet = new Wallet();
 
             $response['data'] = $wallet->purchaseService(
+                Auth::user()->id,
                 $request['title'],
                 $request['mount']
             );

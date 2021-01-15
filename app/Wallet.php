@@ -38,17 +38,15 @@ class Wallet extends Model
                         
         $wallet = Wallet::find($user->id);
 
-        $wallet->mount = $mount;
+        $wallet->mount = $wallet->mount + $mount;
         $wallet->save();
 
         return $wallet;
     }
 
-    public function purchaseService($title, $mount)
+    public function purchaseService($userId, $title, $mount)
     {
-        $user = User::where('identification_number', $identificationNumber)
-                        ->where('phone', $phone)
-                        ->first();
+        $user = User::find($userId);
                         
         $wallet = Wallet::find($user->id);
 
@@ -72,15 +70,16 @@ class Wallet extends Model
     public function purchaseVerifiedService($code)
     {
         $purchase = Purchase::where('code', $code)
+                        ->where('verified', false)
                         ->first();
                         
         $wallet = Wallet::find($purchase->user_id);
 
-        if( $wallet->mount >= $mount){
+        if( $wallet->mount >= $purchase->mount){
             $purchase->verified = true;
             $purchase->save();
 
-            $wallet->mount = $wallet->mount - $mount;
+            $wallet->mount = $wallet->mount - $purchase->mount;
             $wallet->save();
         }
 

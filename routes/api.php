@@ -31,11 +31,11 @@ Route::group(['prefix' => 'auth'], function () {
 
 Route::group(['prefix' => 'wallets'], function () {
     
-    
     Route::group(['middleware' => 'auth:api'], function() {
         Route::post('find', 'Api\WalletController@findWallet');
-        Route::get('purchase', 'Api\WalletController@purchase');
-        Route::get('purchase/verified', 'Api\WalletController@purchaseVerified');
+        Route::put('update', 'Api\WalletController@updateWallet');
+        Route::post('purchase', 'Api\WalletController@purchase');
+        Route::post('purchase/verified', 'Api\WalletController@purchaseVerified');
     });
 
 });
