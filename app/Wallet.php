@@ -75,19 +75,23 @@ class Wallet extends Model
             return false;
         }
 
-        if( $wallet->amount >= $amount){
 
-            $purchase = new Purchase();
+        $purchase = new Purchase();
 
-            $permitted_chars = '123456890ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-            $code = substr(str_shuffle($permitted_chars), 0, 6);
+        $permitted_chars = '123456890ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $code = substr(str_shuffle($permitted_chars), 0, 6);
 
-            $purchase->title = $title;
-            $purchase->amount = $amount;
-            $purchase->code = $code;
-            $purchase->user_id = $user->id;
-            $purchase->save();
-        }
+        //DESCOMENTAR ESTA PARTE CUANDO HAYAN CONFIGURADO EL SMTP
+        // Mail::send('email.verified', ['user' => $user, 'code' => $code, 'purchase' => $purchase], function ($m) use ($user) {
+        //     $m->from('masses@app.com', 'Purchase code');
+        //     $m->to($user->email)->subject('Purchase code!');
+        // });
+
+        $purchase->title = $title;
+        $purchase->amount = $amount;
+        $purchase->code = $code;
+        $purchase->user_id = $user->id;
+        $purchase->save();
 
         return $wallet;
     }
@@ -95,7 +99,7 @@ class Wallet extends Model
     public function purchaseVerifiedService($code)
     {
         $purchase = Purchase::where('code', $code)
-                        ->where('verified', false)
+                        ->where('verified', 0)
                         ->first();
 
         if(!$purchase){
@@ -122,11 +126,6 @@ class Wallet extends Model
         } else {
             return 'Insufficient balance';
         }
-
-        Mail::send('email.verified', ['user' => $user, 'code' => $code, 'purchase' => $purchase], function ($m) use ($user) {
-            $m->from('backend@php.com', 'Purchase code');
-            $m->to($user->email)->subject('Purchase code!');
-        });
 
         return $wallet;
     }
