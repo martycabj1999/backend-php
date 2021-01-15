@@ -24,33 +24,57 @@ class Wallet extends Model
         $user = User::where('identification_number', $identificationNumber)
                         ->where('phone', $phone)
                         ->first();
+
+        if(!$user){
+            return false;
+        }
                         
         $wallet = Wallet::find($user->id);
+
+        if(!$wallet){
+            return false;
+        }
 
         return $wallet;
     }
 
-    public function updateWalletService($identificationNumber, $phone, $mount)
+    public function updateWalletService($identificationNumber, $phone, $amount)
     {
         $user = User::where('identification_number', $identificationNumber)
                         ->where('phone', $phone)
                         ->first();
+
+        if(!$user){
+            return false;
+        }
                         
         $wallet = Wallet::find($user->id);
 
-        $wallet->mount = $wallet->mount + $mount;
+        if(!$wallet){
+            return false;
+        }
+
+        $wallet->amount = $wallet->amount + $amount;
         $wallet->save();
 
         return $wallet;
     }
 
-    public function purchaseService($userId, $title, $mount)
+    public function purchaseService($userId, $title, $amount)
     {
         $user = User::find($userId);
+
+        if(!$user){
+            return false;
+        }
                         
         $wallet = Wallet::find($user->id);
 
-        if( $wallet->mount >= $mount){
+        if(!$wallet){
+            return false;
+        }
+
+        if( $wallet->amount >= $amount){
 
             $purchase = new Purchase();
 
@@ -58,7 +82,7 @@ class Wallet extends Model
             $code = substr(str_shuffle($permitted_chars), 0, 6);
 
             $purchase->title = $title;
-            $purchase->mount = $mount;
+            $purchase->amount = $amount;
             $purchase->code = $code;
             $purchase->user_id = $user->id;
             $purchase->save();
@@ -72,14 +96,22 @@ class Wallet extends Model
         $purchase = Purchase::where('code', $code)
                         ->where('verified', false)
                         ->first();
+
+        if(!$purchase){
+            return false;
+        }
                         
         $wallet = Wallet::find($purchase->user_id);
+        
+        if(!$wallet){
+            return false;
+        }
 
-        if( $wallet->mount >= $purchase->mount){
+        if( $wallet->amount >= $purchase->amount){
             $purchase->verified = true;
             $purchase->save();
 
-            $wallet->mount = $wallet->mount - $purchase->mount;
+            $wallet->amount = $wallet->amount - $purchase->amount;
             $wallet->save();
         }
 

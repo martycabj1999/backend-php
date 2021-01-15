@@ -12,6 +12,7 @@ use App\Wallet;
 
 //Dependencias
 use Mail;
+use Response;
 use Carbon\Carbon;
 
 class AuthController extends Controller {
@@ -36,9 +37,14 @@ class AuthController extends Controller {
         $user->save();
         
         $credentials = request(['email', 'password']);
+        
         if (!Auth::attempt($credentials)) {
-            return response()->json([
-                'message' => 'The email or password are not valid'], 422);
+
+            $response['errors'] = array(
+                "params" => "email or password",
+                "msg" => "The email or password are not valid",
+            );
+            return response()->json($response, 422);
         }
 
         $user = $request->user();
@@ -72,17 +78,21 @@ class AuthController extends Controller {
     public function login(Request $request)
     {
 
-        $request->validate([
-            'email'       => 'required|string|email',
-            'password'    => 'required|string',
-            'remember_me' => 'boolean',
-        ]);
+        // $request->validate([
+        //     'email'       => 'required|string|email',
+        //     'password'    => 'required|string',
+        //     'remember_me' => 'boolean',
+        // ]);
 
         $credentials = request(['email', 'password']);
 
         if (!Auth::attempt($credentials)) {
-            return response()->json([
-                'message' => 'The email or password are not valid'], 422);
+
+            $response['errors'] = array(
+                "params" => "email or password",
+                "msg" => "The email or password are not valid",
+            );
+            return response()->json($response, 422);
         }
 
         $user = $request->user();

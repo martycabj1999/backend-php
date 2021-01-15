@@ -37,6 +37,14 @@ class WalletController extends Controller
                 $request['phone']
             );
 
+            if(!$response['data']){
+                $response['errors'] = array(
+                    "params" => "identification number or phone",
+                    "msg" => "invalid identification number or phone",
+                );
+                return \Response::json($response, 422);
+            }
+
             return \Response::json($response, 200);
         } catch (\Exception $e) {
             \Log::error("Error indexWallet " . $e->getMessage() . " in file " . $e->getFile() . "@" . $e->getLine());
@@ -54,8 +62,16 @@ class WalletController extends Controller
             $response['data'] = $wallet->updateWalletService(
                 $request['identification_number'],
                 $request['phone'],
-                $request['mount']
+                $request['amount']
             );
+
+            if(!$response['data']){
+                $response['errors'] = array(
+                    "params" => "identification number or phone",
+                    "msg" => "invalid identification number or phone",
+                );
+                return \Response::json($response, 422);
+            }
             
             return \Response::json($response, 200);
         } catch (\Exception $e) {
@@ -73,9 +89,17 @@ class WalletController extends Controller
             $response['data'] = $wallet->purchaseService(
                 Auth::user()->id,
                 $request['title'],
-                $request['mount']
+                $request['amount']
             );
             
+            if(!$response['data']){
+                $response['errors'] = array(
+                    "params" => "amount",
+                    "msg" => "invalid amount",
+                );
+                return \Response::json($response, 422);
+            }
+
             return \Response::json($response, 200);
         } catch (\Exception $e) {
             \Log::error("Error purchase " . $e->getMessage() . " in file " . $e->getFile() . "@" . $e->getLine());
@@ -93,11 +117,15 @@ class WalletController extends Controller
                 $request['code']
             );
 
-            if($response['data']){
-                return \Response::json($response, 200);
+            if(!$response['data']){
+                $response['errors'] = array(
+                    "params" => "code",
+                    "msg" => "invalid code",
+                );
+                return \Response::json($response, 422);
             }
             
-            return \Response::json($response, 422);
+            return \Response::json($response, 200);
         } catch (\Exception $e) {
             \Log::error("Error purchaseVerified " . $e->getMessage() . " in file " . $e->getFile() . "@" . $e->getLine());
             $response['error'] = "Error purchaseVerified " . $e->getMessage() . " in file " . $e->getFile() . "@" . $e->getLine();
